@@ -19,3 +19,5 @@
 
 | 2026-10-02 | 7 | Chronological validation windows were small, especially 2026 YTD. | Every validation window was positive in realized P&L, but bootstrap intervals included zero. | Reported the result as supportive but statistically inconclusive rather than as proof of a stable edge. |
 | 2026-10-02 | 8 | Final manuscript necessarily inherits all data and deterministic-reconstruction limitations. | The manuscript cannot establish the original author's discretionary live performance. | Explicitly labels the study as a deterministic approximation and records higher-frequency/discretionary reconstruction as future research. |
+
+| 2026-10-02 | 9 | The original research stop criterion had already been reached before the user requested component-level differential analysis. | Extending silently would violate the bounded research-plan rule. | Created an explicit Phase 9 extension with no parameter optimization and a new stop condition after the differential report. |\n

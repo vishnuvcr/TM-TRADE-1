@@ -13,12 +13,27 @@ Last updated: 2026-10-02
 | 6 — Robustness/sensitivity | COMPLETE | 12 sensitivity scenarios plus volatility/trend regime analysis. Most cost/target/confirmation variants remained positive; same-close entry was negative. High-volatility regimes materially outperformed low-volatility regimes. |
 | 7 — Walk-forward validation | COMPLETE | 123 chronological validation trades across 2023, 2024, 2025 and 2026 YTD; every window had positive realized P&L, but every bootstrap interval included zero. |
 | 8 — Manuscript | COMPLETE | Final structured manuscript, tables, figures, appendices and reproducibility references committed. |
+| 9 — Monthly vs bi-weekly differential | IN PROGRESS | Dedicated frozen-rule decomposition created; GitHub Actions workflow added. No parameters optimized. |
 
-## Final empirical conclusion
+## Phase 9 scope
+
+This requested extension decomposes the existing frozen reconstruction into monthly and bi-weekly components by:
+
+- trade count and contribution to total P&L;
+- average/median trade, average winner/loser and profit factor;
+- costs and cost drag;
+- target, adjustment, break-even and time exits;
+- holding period;
+- yearly and quarterly behavior;
+- descriptive bootstrap comparison of mean trade P&L.
+
+The phase does **not** alter the frozen base parameters and does not promote any component-specific parameter into the strategy.
+
+## Existing final empirical conclusion
 
 Under the frozen deterministic reconstruction, the strategy produced positive aggregate historical P&L after modeled costs and remained positive in every chronological validation window tested from 2023 through 2026 YTD. The evidence is not statistically decisive at the individual validation-window level because all bootstrap intervals include zero.
 
-The strongest caveats are:
+The strongest caveats remain:
 - material sensitivity to entry convention;
 - substantial concentration of historical P&L in high-volatility regimes;
 - a large 2020 contribution;
@@ -26,8 +41,6 @@ The strongest caveats are:
 - daily-bar and third-party-data limitations;
 - discretionary source rules that cannot be reproduced exactly.
 
-No parameter was promoted from sensitivity testing into the base strategy after walk-forward validation.
+## Stop control
 
-## Research stop criterion
-
-The planned research phases are complete. Further work is listed under Future Research in the final manuscript rather than extending the current research indefinitely.
+Phase 9 is a bounded differential-analysis extension requested after completion of the original research stop criterion. Once its results are audited and committed, the research returns to a stopped state; no further parameter optimization is initiated automatically.
