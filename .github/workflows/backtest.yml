@@ -1,0 +1,67 @@
+name: NIFTY Double Calendar Backtest
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "Backtest start date"
+        required: false
+        default: "2025-09-01"
+      end:
+        description: "Backtest end date"
+        required: false
+        default: "2026-07-28"
+  push:
+    paths:
+      - "scripts/run_backtest.py"
+      - ".github/workflows/backtest.yml"
+      - "research/**"
+
+permissions:
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore cached market data
+        uses: actions/cache@v4
+        with:
+          path: data/market_data.duckdb
+          key: nifty-options-market-data-aaryan-2026-10-02-v1
+
+      - name: Download market-data cache on miss
+        shell: bash
+        run: |
+          mkdir -p data
+          if [ ! -f data/market_data.duckdb ]; then
+            curl -L --fail --retry 3 --retry-delay 2               -o data/market_data.duckdb               https://raw.githubusercontent.com/aaryan-say/nifty-options-delta-neutral-backtest/main/data/market_data.duckdb
+          fi
+          sha256sum data/market_data.duckdb | tee data/market_data.sha256
+          ls -lh data/market_data.duckdb
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pandas numpy scipy duckdb
+
+      - name: Run deterministic reconstruction
+        env:
+          START_DATE: ${{ inputs.start || '2025-09-01' }}
+          END_DATE: ${{ inputs.end || '2026-07-28' }}
+        run: |
+          python scripts/run_backtest.py --db data/market_data.duckdb --start "$START_DATE" --end "$END_DATE" --out results
+
+      - name: Upload backtest outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: nifty-double-calendar-backtest-results
+          path: |
+            results/**
+            data/market_data.sha256
