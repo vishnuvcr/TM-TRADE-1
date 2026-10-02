@@ -13,16 +13,19 @@ from scipy.stats import norm
 R = 0.065
 Q = 0.0
 SLIPPAGE_BPS = 10.0
-LOT_OLD = 75
-LOT_NEW = 65
 LOT_CHANGE_DATE = pd.Timestamp("2026-01-06")
+# Expiry-date lot-size schedule: 50 before Apr-2024 transition, 25 for
+# contracts introduced after Apr-25-2024 and before Nov-21-2024, 75 thereafter,
+# and 65 from the Jan-2026 transition. These are expiry/generation proxies.\nLOT_50_END = pd.Timestamp("2024-04-25")\nLOT_25_END = pd.Timestamp("2024-11-20")
 NSE_TXN = 0.0003553
 SEBI_FEE = 0.000001
 STAMP = 0.00003
 GST = 0.18
 BROKER_ORDER = 10.0
-STT_OLD = 0.0010
-STT_NEW = 0.0015
+STT_PRE_2023 = 0.0005
+STT_2023_TO_SEP2024 = 0.000625
+STT_OCT2024_TO_MAR2026 = 0.0010
+STT_FROM_APR2026 = 0.0015
 
 @dataclass
 class Leg:
@@ -38,7 +41,18 @@ class Leg:
         return self.side * (mark - self.entry_exec) * lot
 
 def lot_size_for_expiry(expiry):
-    return LOT_NEW if pd.Timestamp(expiry) >= LOT_CHANGE_DATE else LOT_OLD
+    x=pd.Timestamp(expiry).normalize()
+    if x <= LOT_50_END: return 50
+    if x <= LOT_25_END: return 25
+    if x < LOT_CHANGE_DATE: return 75
+    return 65
+
+def stt_rate(sell_date):
+    x=pd.Timestamp(sell_date).normalize()
+    if x < pd.Timestamp("2023-04-01"): return STT_PRE_2023
+    if x < pd.Timestamp("2024-10-01"): return STT_2023_TO_SEP2024
+    if x < pd.Timestamp("2026-04-01"): return STT_OCT2024_TO_MAR2026
+    return STT_FROM_APR2026
 
 def first_trading_on_or_after(days, d):
     x = pd.Timestamp(d)
@@ -200,7 +214,7 @@ class Backtester:
             if l.side == 1:
                 cost += v_in * STAMP
             else:
-                cost += v_in * (STT_NEW if pd.Timestamp(l.entry_date)>=pd.Timestamp("2026-04-01") else STT_OLD)
+                cost += v_in * stt_rate(l.entry_date)
             # Exit
             orders += 1
             s=self.option_series(l.expiry,l.strike,l.opt)
@@ -211,7 +225,7 @@ class Backtester:
             if l.side == -1:
                 cost += v_out * STAMP
             else:
-                cost += v_out * (STT_NEW if pd.Timestamp(exit_date)>=pd.Timestamp("2026-04-01") else STT_OLD)
+                cost += v_out * stt_rate(exit_date)
         brokerage = orders * BROKER_ORDER
         gst = GST * (brokerage + self.exchange_cost_basis(legs, exit_date))
         return cost + brokerage + gst
@@ -421,8 +435,8 @@ def summarize(df):
 
 def main():
     ap=argparse.ArgumentParser()
-    ap.add_argument("--db", default="data/market_data.duckdb")
-    ap.add_argument("--start", default="2025-09-01")
+    ap.add_argument("--db", default="data/historical_2020_2026.duckdb")
+    ap.add_argument("--start", default="2020-01-01")
     ap.add_argument("--end", default="2026-07-28")
     ap.add_argument("--out", default="results")
     ap.add_argument("--entry-mode", default="next_open")
