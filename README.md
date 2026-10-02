@@ -2,11 +2,33 @@
 
 Research project: empirical evaluation of a NIFTY positional double-calendar option-selling framework.
 
-## Current status
+## Final research status
 
-**Phase 5 historical extension is complete.** The 2020-2026 requested window produced **264 reconstructed trade segments and ₹11,71,475.36 net P&L** after modeled execution costs. The long-sample result is not yet the final trading-system conclusion; Phase 6 robustness and walk-forward validation remain.
+**The planned research is complete through chronological validation and manuscript production.**
 
-Most relevant to the original question: the historical extension found **39 adjustment exits, with 0 profitable adjustment exits and -₹42,149.70 total adjustment P&L**.
+The frozen deterministic reconstruction produced **264 historical trade segments and ₹11,71,475.36 net P&L** over the 2020-2026 requested window after modeled costs. The later chronological validation produced **123 trades and ₹1,21,608.72 net P&L** across 2023, 2024, 2025 and 2026 YTD, with positive realized P&L in every window.
+
+This is **not a claim of guaranteed or statistically proven future profitability**. Every individual chronological validation window had a bootstrap confidence interval that included zero.
+
+The most important structural findings are:
+
+- Monthly target: **₹3,000/lot**.
+- Bi-weekly target: **₹1,600/lot**.
+- 39 adjustment exits were reconstructed and **all 39 were loss-making**, totaling **-₹42,149.70**.
+- High-volatility regimes materially outperformed low-volatility regimes.
+- The result remained positive under tested 20–30 bps adverse slippage.
+- Excluding 2020 left **₹3,16,260** net P&L.
+- Same-close entry produced **-₹2,74,505**, demonstrating material execution-timing sensitivity.
+
+## Final manuscript
+
+- [Final research manuscript](research/results/FINAL_RESEARCH_MANUSCRIPT.md)
+- [Historical 2020-2026 results](research/results/HISTORICAL_2020_2026_RESULTS.md)
+- [Phase 6 robustness and regime results](research/results/PHASE6_ROBUSTNESS_RESULTS.md)
+- [Phase 7 walk-forward results](research/results/PHASE7_WALKFORWARD_RESULTS.md)
+- [Historical machine-readable summary](research/results/historical_summary.json)
+- [Historical P&L figure](research/results/figures/historical_net_pnl.svg)
+- [Walk-forward P&L figure](research/results/figures/walkforward_net_pnl.svg)
 
 ## Research controls
 
@@ -18,26 +40,24 @@ Most relevant to the original question: the historical extension found **39 adju
 - [Literature notes](research/LITERATURE_NOTES.md)
 - [Data sources](research/DATA_SOURCES.md)
 - [Core backtest report](research/results/CORE_BACKTEST_RESULTS.md)
-- [Historical 2020-2026 report](research/results/HISTORICAL_2020_2026_RESULTS.md)
-- [Historical machine-readable summary](research/results/historical_summary.json)
-- [Phase 6 robustness and regime results](research/results/PHASE6_ROBUSTNESS_RESULTS.md)
 - [Final trade ledger](research/results/trade_ledger.csv)
-- [Final machine-readable summary](research/results/summary.json)
 
-## Strategy under test
+## Reproducibility
 
-The supplied source describes monthly and bi-weekly ATM double calendars with fixed profit targets, time exits, and full-position redeployment after a break-even breach. Exact Greek/IV/OI/strike filters and some execution timings are discretionary in the source, so this quantitative implementation makes those choices explicit.
+Historical dataset SHA-256:
+e4c6d2e1ddd2dbd9a7ab4c3be5460585ca5d8f0267123cd30b507cbbf6414bed
 
-## Phase 5 — Historical extension
+Key GitHub Actions runs:
 
-The historical workflow has a manual `workflow_dispatch` control and caches the Hugging Face inputs and constructed DuckDB. The historical option files are from `rissin/nse-options-intraday` and derive from NSE F&O bhavcopy data; NIFTY spot is sourced from `thetrademarkk/india-index-options-1m`, with a 2017-2021 fallback dataset for the earlier spot period.
+- Historical reconstruction: 37023127851
+- Robustness sensitivity: 37024072980
+- Regime analysis: 37024672046
+- Walk-forward validation: 37025149087
 
-The requested research window is **2020-01-01 through 2026-07-28**, but the assembled spot data ends on 2026-07-02 and the latest reconstructed trade exits on 2026-06-05. Raw market data is not committed to the repository; source identifiers, hashes, code, manifests and results are recorded instead.
+All major workflows retain manual workflow-dispatch controls and use cached historical data rather than re-downloading the market dataset on every run.
 
-## Phase 6 — Robustness result
+## Final interpretation
 
-Phase 6 is complete. The historical result remained positive across the tested slippage, target and confirmation scenarios, including 20–30 bps slippage and exclusion of 2020. Same-close entry was strongly negative, demonstrating entry-timing sensitivity. Regime analysis found materially stronger results in high-volatility periods than low-volatility periods.
+The documented double-calendar framework has a positive historical deterministic reconstruction under the frozen next-open execution convention. Its performance is materially regime- and execution-dependent, and the adjustment component is consistently loss-making in the available data.
 
-## Next research phase
-
-Phase 7 is chronological out-of-sample/walk-forward validation using the frozen base rules. No sensitivity result will be promoted into the base strategy before that validation.
+The study therefore supports further controlled paper/live validation and higher-frequency research, but it does not establish a guaranteed or stable future trading edge.
