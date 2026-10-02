@@ -1,0 +1,59 @@
+name: Phase 7 Walk-Forward Validation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/phase7_walkforward.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validation:
+    strategy:
+      fail-fast: false
+      matrix:
+        window:
+          - name: test_2023
+            start: "2023-01-01"
+            end: "2023-12-31"
+          - name: test_2024
+            start: "2024-01-01"
+            end: "2024-12-31"
+          - name: test_2025
+            start: "2025-01-01"
+            end: "2025-12-31"
+          - name: test_2026
+            start: "2026-01-01"
+            end: "2026-07-02"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            data/historical_2020_2026.duckdb
+            data/historical_2020_2026.duckdb.sha256
+            data/historical_manifest.json
+          key: tm-trade1-historical-duckdb-2020-2026-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install pandas numpy scipy duckdb pyarrow
+      - name: Run frozen base rules on untouched test window
+        env:
+          START: ${{ matrix.window.start }}
+          END: ${{ matrix.window.end }}
+          NAME: ${{ matrix.window.name }}
+        run: |
+          mkdir -p walkforward_results
+          python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start "$START" --end "$END" --out walkforward_results
+          cp walkforward_results/summary.json walkforward_results/"$NAME".json
+      - name: Upload validation result
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase7-${{ matrix.window.name }}
+          path: walkforward_results/${{ matrix.window.name }}.json
