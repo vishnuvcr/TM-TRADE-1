@@ -20,6 +20,7 @@ Most relevant to the original question: the historical extension found **39 adju
 - [Core backtest report](research/results/CORE_BACKTEST_RESULTS.md)
 - [Historical 2020-2026 report](research/results/HISTORICAL_2020_2026_RESULTS.md)
 - [Historical machine-readable summary](research/results/historical_summary.json)
+- [Phase 6 robustness and regime results](research/results/PHASE6_ROBUSTNESS_RESULTS.md)
 - [Final trade ledger](research/results/trade_ledger.csv)
 - [Final machine-readable summary](research/results/summary.json)
 
@@ -33,6 +34,10 @@ The historical workflow has a manual `workflow_dispatch` control and caches the 
 
 The requested research window is **2020-01-01 through 2026-07-28**, but the assembled spot data ends on 2026-07-02 and the latest reconstructed trade exits on 2026-06-05. Raw market data is not committed to the repository; source identifiers, hashes, code, manifests and results are recorded instead.
 
+## Phase 6 — Robustness result
+
+Phase 6 is complete. The historical result remained positive across the tested slippage, target and confirmation scenarios, including 20–30 bps slippage and exclusion of 2020. Same-close entry was strongly negative, demonstrating entry-timing sensitivity. Regime analysis found materially stronger results in high-volatility periods than low-volatility periods.
+
 ## Next research phase
 
-Phase 6 will test whether the historical result survives slippage/cost/target/entry-time/break-even sensitivities, exclusion of 2020, and market-regime segmentation. Only after those rules are frozen will walk-forward validation and the final manuscript be produced.
+Phase 7 is chronological out-of-sample/walk-forward validation using the frozen base rules. No sensitivity result will be promoted into the base strategy before that validation.
