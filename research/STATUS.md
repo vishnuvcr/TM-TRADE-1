@@ -4,15 +4,17 @@ Last updated: 2026-10-02
 
 | Phase | Status | Current result |
 |---|---|---|
-| 0 — Specification/audit | COMPLETE | Research plan initialized from supplied strategy document. |
-| 1 — Data acquisition | IN PROGRESS | Repo is empty of prior data; external historical-option datasets are being sourced and validated. |
-| 2 — Strategy engine | NOT STARTED | Awaiting data schema and final deterministic execution conventions. |
-| 3 — Costs | NOT STARTED | Paytm Money and statutory cost schedule to be verified. |
-| 4 — Core backtest | NOT STARTED | — |
-| 5 — Robustness | NOT STARTED | — |
-| 6 — Walk-forward validation | NOT STARTED | — |
-| 7 — Manuscript | NOT STARTED | — |
+| 0 — Specification/audit | COMPLETE | Strategy rules, assumptions, research plan and error log initialized. |
+| 1 — Data acquisition | COMPLETE | Public third-party daily NIFTY option cache validated; SHA-256 recorded. |
+| 2 — Deterministic strategy engine | COMPLETE | Monthly + bi-weekly reconstruction implemented with explicit operational assumptions. |
+| 3 — Cost/execution model | COMPLETE | Paytm Money brokerage, exchange charges, STT, stamp duty, GST and 10-bps slippage modeled. |
+| 4 — Core backtest | COMPLETE | 29 trades; net P&L ₹20,850.33; monthly +₹27,765.93; bi-weekly -₹6,915.60. |
+| 5 — Robustness/sensitivity | NEXT | Slippage, cost, target, entry-time and break-even confirmation sensitivity. |
+| 6 — Walk-forward validation | NOT STARTED | Requires robustness rules to be frozen. |
+| 7 — Manuscript | NOT STARTED | Will be completed after validation phases. |
 
-## Current blockers
-1. Historical option data with synchronized multi-expiry prices is required.
-2. The source document leaves some strike/IV/Greek and intraday execution details discretionary; these will be parameterized rather than invented.
+## Current conclusion
+The deterministic reconstruction is positive in aggregate, but the positive result is driven by the monthly variant. The bi-weekly variant is negative in the available sample. The result should not yet be treated as a validated trading system because daily data and unspecified discretionary filters remain material limitations.
+
+## Next research action
+Run sensitivity analysis and regime segmentation before any overall strategy conclusion is accepted.
