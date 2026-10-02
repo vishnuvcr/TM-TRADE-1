@@ -22,3 +22,12 @@
 
 ## Data limitations
 The third-party daily dataset does not provide the historical bid/ask microstructure needed for an observed spread/slippage model. It also cannot reconstruct intraday order sequencing. The validation phase should therefore sample important trades against NSE archives and, where available, higher-frequency option data.
+
+## Phase 5 historical sources
+
+- `rissin/nse-options-intraday` — yearly NIFTY daily option Parquet files; dataset documentation states daily historical data derives from NSE F&O bhavcopy. https://huggingface.co/datasets/rissin/nse-options-intraday
+- `thetrademarkk/india-index-options-1m` — NIFTY index Parquet used for spot OHLC reconstruction from 2021 onward. https://huggingface.co/datasets/thetrademarkk/india-index-options-1m
+- `calender/indian-stock-hourly-2017-2021` — earlier NIFTY spot fallback. https://huggingface.co/datasets/calender/indian-stock-hourly-2017-2021
+- NSE historical contract-wise F&O price/volume reports: https://www.nseindia.com/report-detail/fo_eq_security
+
+The repository stores hashes/manifests and workflow cache identifiers rather than redistributing raw exchange-derived files.
