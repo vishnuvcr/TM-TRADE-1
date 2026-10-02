@@ -282,7 +282,7 @@ class Backtester:
         segment_no=0
         adjust_limit = (current_entry + pd.Timedelta(days=7)) if kind=="monthly" else first_friday_on_or_after(self.days, current_entry+pd.Timedelta(days=1))
         while current_entry is not None and current_entry < hard_end:
-            use_open = True
+            use_open = (self.entry_mode == "next_open")
             legs, err=self.make_legs(current_entry,near_exp,far_exp,use_open=use_open)
             if legs is None:
                 rows.append({"kind":kind,"segment":segment_no,"entry_date":str(current_entry.date()),"status":"SKIP","reason":err})
