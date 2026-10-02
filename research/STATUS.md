@@ -9,15 +9,25 @@ Last updated: 2026-10-02
 | 2 — Deterministic strategy engine | COMPLETE | Monthly + bi-weekly reconstruction implemented with explicit operational assumptions. |
 | 3 — Cost/execution model | COMPLETE / EXTENDED | Entry/exit slippage, brokerage, exchange charges, historical STT, stamp duty and GST modeled. |
 | 4 — Core backtest | COMPLETE / AUDITED | 28 trades in 2025-09 to 2026-07; net P&L ₹17,709.28. |
-| 5 — Historical extension | COMPLETE / AUDITED | 264 reconstructed segments over 2020-2026 requested window; net P&L ₹11,71,475.36. Adjustment exits: 39/39 losses, total -₹42,149.70. |
-| 6 — Robustness/sensitivity | COMPLETE | 12 sensitivity scenarios plus volatility/trend regime analysis completed. Most cost/target/confirmation variants remained positive; same-close entry was negative. High-volatility regimes materially outperformed low-volatility regimes. |
-| 7 — Walk-forward validation | NEXT | Chronological rolling out-of-sample windows using frozen Phase 6 base rules. |
-| 8 — Manuscript | NOT STARTED | Final manuscript after validation phases. |
+| 5 — Historical extension | COMPLETE / AUDITED | 264 reconstructed segments over the 2020-2026 requested window; net P&L ₹11,71,475.36. |
+| 6 — Robustness/sensitivity | COMPLETE | 12 sensitivity scenarios plus volatility/trend regime analysis. Most cost/target/confirmation variants remained positive; same-close entry was negative. High-volatility regimes materially outperformed low-volatility regimes. |
+| 7 — Walk-forward validation | COMPLETE | 123 chronological validation trades across 2023, 2024, 2025 and 2026 YTD; every window had positive realized P&L, but every bootstrap interval included zero. |
+| 8 — Manuscript | COMPLETE | Final structured manuscript, tables, figures, appendices and reproducibility references committed. |
 
-## Current conclusion
-The historical extension materially expands the sample. Under the deterministic reconstruction, the aggregate result is positive and the bootstrap 95% interval for mean trade P&L is above zero. However, 2020 contributes an unusually large share of the aggregate P&L, and the model still has daily-data, discretionary-rule and third-party-data limitations.
+## Final empirical conclusion
 
-For the specific adjustment question: **adjustments remained loss-making in the long sample**. There were 39 adjustment exits, with zero profitable adjustment exits and total net P&L of -₹42,149.70.
+Under the frozen deterministic reconstruction, the strategy produced positive aggregate historical P&L after modeled costs and remained positive in every chronological validation window tested from 2023 through 2026 YTD. The evidence is not statistically decisive at the individual validation-window level because all bootstrap intervals include zero.
 
-## Next research action
-Freeze the historical rules and run robustness/sensitivity analysis, including a dedicated 2020 exclusion/regime analysis and parameter sensitivity before any final trading-system conclusion.
+The strongest caveats are:
+- material sensitivity to entry convention;
+- substantial concentration of historical P&L in high-volatility regimes;
+- a large 2020 contribution;
+- 39/39 losing adjustment exits;
+- daily-bar and third-party-data limitations;
+- discretionary source rules that cannot be reproduced exactly.
+
+No parameter was promoted from sensitivity testing into the base strategy after walk-forward validation.
+
+## Research stop criterion
+
+The planned research phases are complete. Further work is listed under Future Research in the final manuscript rather than extending the current research indefinitely.
