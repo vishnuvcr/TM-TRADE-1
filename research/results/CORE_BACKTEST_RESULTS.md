@@ -1,101 +1,109 @@
-# Core Backtest Results — NIFTY Positional Double-Calendar Framework
+# NIFTY Positional Double-Calendar Strategy — Corrected Core Backtest
 
 ## Status
-Phase 4 (core deterministic backtest): **completed** on 2026-10-02.
+Corrected core deterministic backtest completed on 2026-10-02.
+GitHub Actions run: 37015617205
+Data cache SHA-256: d0a07420b9981a94ef1960f7650196dbca730986852cb6515afa9c7f7b3a2694
 
-Successful GitHub Actions run: **37015101390**.
-Data-cache SHA-256: **d0a07420b9981a94ef1960f7650196dbca730986852cb6515afa9c7f7b3a2694**.
+## Source strategy translated into testable rules
+The supplied strategy uses an ATM double calendar: sell the near-expiry ATM call and put and buy the same-strike call and put in the farther expiry. The monthly version targets ₹3,000/lot and normally exits after 7–10 days; the bi-weekly version targets ₹1,600/lot and exits within 7 days. A break-even breach triggers closure of the full position and, when early enough, redeployment at the current spot.
+The source also states that real execution uses discretionary judgment around strike selection, Greeks, IV, open interest, timing and confirmation of a breach. Therefore this is a deterministic reconstruction, not an exact replication of the source creator's discretionary live trading.
 
-## Test definition
-- Window: **2025-09-01 through 2026-07-28**.
-- Instrument: **NIFTY index options**.
-- Data: public third-party DuckDB cache from the `aaryan-say/nifty-options-delta-neutral-backtest` repository.
-- Source-reported coverage: NIFTY OHLC from 2025-03-24 onward and 71 expiries through 2026-07-28.
-- Entry: first trading day after the cycle boundary, using option **open**.
-- ATM: nearest strike common to CE/PE in both near and far expiries on entry.
-- Marking / exits: daily option **close**.
-- Daily data means intraday target/breach ordering cannot be reconstructed.
-- Break-even: model-based Black-Scholes inversion from observed close prices and current theoretical payoff roots.
-- Slippage: **10 bps adverse** per option execution.
-- Capital proxy: **₹1.20 lakh per lot**.
+## Test window and data
+- Period: 2025-09-01 to 2026-07-28
+- Instrument: NIFTY index options
+- Data: cached public daily OHLC DuckDB dataset from aaryan-say/nifty-options-delta-neutral-backtest
+- Execution granularity: daily OHLC
+- Entry: first trading day after the cycle boundary, option open
+- ATM: nearest common CE/PE strike available in both near and far expiries on entry date
+- Exit/mark: option close
+- Break-even: model-based Black-Scholes inversion from observed option closes
+- Slippage: 10 bps adverse on entry and exit executions
+- Capital proxy: ₹1.20 lakh/lot
 
-## Cost model
-- Paytm Money brokerage: **₹10 per executed order**.
-- NSE equity-option transaction charges: **0.03553% of traded premium value per side**.
-- SEBI turnover fee: **0.0001%**.
-- Stamp duty on option purchases: **0.003%**.
-- STT on option sales: **0.10% through 2026-03-31; 0.15% from 2026-04-01**.
-- GST: **18%** on brokerage and exchange transaction-charge component in this first implementation.
+## Corrected transaction-cost model
+- Paytm Money brokerage: ₹10 per executed order
+- NSE option transaction charge: 0.03553% of traded premium value per side
+- SEBI turnover fee: 0.0001%
+- Stamp duty: 0.003% on option purchases
+- STT: 0.10% on option sales through 2026-03-31 and 0.15% from 2026-04-01
+- GST: 18% on brokerage and exchange/SEBI transaction-charge component
+Exit-side slippage and the direction of STT versus stamp duty were explicitly audited and corrected before accepting the final run.
 
-## Core results
+## Final core results
+
 | Metric | Result |
 |---|---:|
-| Reconstructed trades | **29** |
-| Winning trades | **14** |
-| Losing trades | **15** |
-| Win rate | **48.28%** |
-| Gross P&L | **₹28,596.26** |
-| Modeled costs + slippage impact | **₹7,745.89** |
-| Net P&L | **₹20,850.33** |
-| Average net P&L / trade | **₹718.98** |
-| Median net P&L / trade | **-₹24.98** |
-| Profit factor | **1.71** |
-| Worst trade | **-₹6,156.44** |
-| Best trade | **₹9,888.77** |
-| Trade-sequence max drawdown | **-₹10,330.32 (8.61% of ₹1.20L)** |
-| Average holding period | **3.45 days** |
-| Adjustment segments | **8** |
-| Lowest monthly return on ₹1.20L proxy | **-2.18%** |
-| Highest monthly return on ₹1.20L proxy | **+5.70%** |
+| Trades | 29 |
+| Winning trades | 14 |
+| Losing trades | 15 |
+| Win rate | 48.28% |
+| Gross P&L | ₹25,964.23 |
+| Costs + slippage | ₹8,246.95 |
+| Net P&L | ₹17,717.27 |
+| Average net P&L/trade | ₹610.94 |
+| Median net P&L/trade | -₹153.70 |
+| Profit factor | 1.58 |
+| Worst trade | -₹6,218.31 |
+| Best trade | ₹9,725.50 |
+| Trade-sequence max drawdown | -₹10,870.78 |
+| Max drawdown / ₹1.20L proxy | -9.06% |
+| Average holding period | 3.45 days |
+| Adjustment segments | 8 |
+| Lowest monthly return on ₹1.20L proxy | -2.75% |
+| Highest monthly return on ₹1.20L proxy | +5.51% |
 
-The drawdown above is based on realized trade P&L, not full daily mark-to-market, so it can understate interim risk.
+The reported drawdown is a realized-trade-sequence drawdown, not full daily mark-to-market drawdown.
 
-## Monthly vs bi-weekly
+## Monthly versus bi-weekly
+
 | Variant | Trades | Gross P&L | Costs | Net P&L | Win rate | Profit factor |
 |---|---:|---:|---:|---:|---:|---:|
-| Monthly | 12 | ₹31,682.62 | ₹3,916.68 | **₹27,765.93** | 58.33% | **4.00** |
-| Bi-weekly | 17 | -₹3,086.36 | ₹3,829.21 | **-₹6,915.60** | 41.18% | 0.65 |
-| Combined | 29 | ₹28,596.26 | ₹7,745.89 | **₹20,850.33** | 48.28% | 1.71 |
+| Monthly | 12 | ₹30,197.55 | ₹4,238.68 | ₹25,958.85 | 58.33% | 3.61 |
+| Bi-weekly | 17 | -₹4,233.32 | ₹4,008.27 | -₹8,241.58 | 41.18% | 0.60 |
+| Combined | 29 | ₹25,964.23 | ₹8,246.95 | ₹17,717.27 | 48.28% | 1.58 |
 
-The positive combined result is driven primarily by the **monthly** variant. The **bi-weekly** variant is negative in this reconstructed sample.
+The corrected result is therefore primarily driven by the monthly version. The bi-weekly version is negative over this sample.
 
 ## Exit-reason decomposition
+
 | Exit reason | Trades | Net P&L |
 |---|---:|---:|
-| Target | 12 | **₹50,018.03** |
-| Adjustment | 8 | **-₹14,110.08** |
-| Time exit | 5 | **-₹11,028.58** |
-| Break-even exit | 4 | **-₹4,029.04** |
-
-Target exits supplied most of the positive realized P&L; adjustment and time-exit segments accounted for most losses.
+| Target | 12 | ₹48,481.40 |
+| Adjustment | 8 | -₹14,955.89 |
+| Time exit | 5 | -₹11,474.43 |
+| Break-even exit | 4 | -₹4,333.81 |
 
 ## Monthly realized P&L
-- 2025-10: **-₹2,417.79**
-- 2025-11: **+₹6,408.74**
-- 2025-12: **-₹446.14**
-- 2026-01: **+₹6,606.83**
-- 2026-02: **-₹70.79**
-- 2026-03: **+₹4,478.51**
-- 2026-04: **+₹6,836.90**
-- 2026-05: **-₹2,621.12**
-- 2026-06: **+₹2,075.19**
+
+| Month | Net P&L | Return on ₹1.20L proxy |
+|---|---:|---:|
+| 2025-10 | -₹2,681.70 | -2.23% |
+| 2025-11 | ₹5,984.97 | +4.99% |
+| 2025-12 | -₹562.07 | -0.47% |
+| 2026-01 | ₹6,055.08 | +5.05% |
+| 2026-02 | -₹449.49 | -0.37% |
+| 2026-03 | ₹4,286.83 | +3.57% |
+| 2026-04 | ₹6,611.46 | +5.51% |
+| 2026-05 | -₹3,295.23 | -2.75% |
+| 2026-06 | ₹1,767.42 | +1.47% |
+
+## Statistical qualification
+The bootstrap 95% interval for mean trade P&L is approximately -₹568.93 to +₹1,957.92, so the interval includes zero. This is a trade-level resampling interval and does not address serial dependence or parameter uncertainty. The 48.28% win rate is also not itself evidence of a statistical edge; the positive profit factor comes from the average win being much larger than the average loss.
 
 ## Interpretation
-1. The documented framework is not uniformly profitable across its variants in this sample.
-2. The reconstructed **monthly double calendar** is materially stronger than the bi-weekly version.
-3. The combined result remains positive after modeled costs and 10-bps adverse slippage, but implementation costs remove a meaningful fraction of gross P&L.
-4. Losses cluster in the adjustment and time-exit paths.
-5. This is a **deterministic reconstruction**, not a replication of the creator's exact live execution, because the source explicitly leaves entry timing, strike filters, IV/Greek checks and breach confirmation partly discretionary.
+The corrected deterministic sample is positive in aggregate, but it does not establish a statistically reliable edge. The strongest empirical feature is the large difference between the monthly and bi-weekly variants. Modeled costs and slippage remove about 31.8% of gross P&L.
+The source's live-performance statement that no month was below -1% is not reproduced by this deterministic backtest; the worst reconstructed month is approximately -2.75%. That difference is not a direct contradiction because the source itself describes discretionary execution and because the backtest uses daily rather than intraday data.
 
 ## Limitations
-- Daily OHLC cannot identify intraday target/breach ordering.
-- Exact numerical strike/IV/Greek/OI filters are not fully specified in the source.
-- The break-even calculation is an approximation of a broker/Sensibull payoff engine.
-- 10-bps slippage is a sensitivity assumption, not an observed bid/ask measurement.
-- ₹1.20 lakh is a capital proxy rather than live SPAN margin.
-- The reported drawdown is not full mark-to-market drawdown.
-- The public dataset is third-party cached data; a later phase should cross-check selected observations against NSE archives.
-- One historical window is insufficient to establish robustness.
+1. Daily OHLC cannot reconstruct intraday target/break-even ordering.
+2. Exact source strike/IV/Greek/OI filters are not numerically specified.
+3. The break-even calculation is a model approximation rather than an exchange/broker payoff snapshot.
+4. Slippage is assumed, not observed from historical bid/ask quotes.
+5. ₹1.20 lakh is a capital proxy, not live SPAN margin.
+6. Drawdown is not full mark-to-market drawdown.
+7. The current dataset is a third-party cached dataset and should be cross-checked against NSE archives for selected trades before final validation.
+8. The sample is relatively short and ends at 2026-07-28, the available data endpoint.
 
 ## Next phase
-Run slippage/cost sensitivity, target-before-vs-after-cost tests, entry-time sensitivity, break-even confirmation sensitivity, monthly-only vs bi-weekly-only tests, market-regime splits, and walk-forward out-of-sample validation.
+Run parameter sensitivity (slippage, targets, entry timing and breach confirmation), regime segmentation (including volatility/gap states), and frozen-parameter walk-forward validation. Only after those tests should the project produce a final research manuscript/conclusion.
