@@ -58,5 +58,11 @@ The supplied source itself says this is partly manual/discretionary and argues t
 ## Stop criterion
 Research stops after Phase 6 and completion of Phase 7. It must produce a usable empirical conclusion and will not be extended indefinitely.
 
+## Phase 9 extension — Monthly vs bi-weekly differential analysis
+Status: IN PROGRESS
+Reason: User explicitly requested a deeper differential analysis after completion of the original stop criterion.
+Scope: Decompose the frozen reconstruction by monthly and bi-weekly component without changing entry convention, targets, costs, slippage or break-even logic. Report exit reasons, winner/loser distribution, holding period, costs, yearly/quarterly behavior and descriptive uncertainty.
+No parameter optimization is permitted in this phase. The extension stops after the differential report is audited and committed.
+
 ## Versioning rule
 Material changes to the proposed methodology require an explicit plan revision entry. Routine status/results updates do not alter the core plan.
