@@ -22,22 +22,22 @@ Status: COMPLETE/INITIALIZED
 Deliverables: plan, research status, error log, source reference, assumptions register.
 
 ### Phase 1 — Market-data acquisition
-Status: IN PROGRESS
+Status: COMPLETE
 Data needed: NIFTY spot/index history; historical NIFTY option contracts for all required expiries/strikes; contract specifications; expiry calendar; lot-size history; contract changes; optional volatility/regime context.
 Preferred sources: NSE historical derivatives data / bhavcopy archives; exchange-compatible public datasets; reputable open datasets / GitHub / Kaggle / Hugging Face.
 Data should be cached rather than re-downloaded on every workflow run.
 
 ### Phase 2 — Deterministic strategy engine
-Status: NOT STARTED
+Status: COMPLETE
 Base test will use a fully reproducible execution convention: entry at the first available synchronized quote/bar after the scheduled entry date/time; ATM defined as strike nearest spot at entry; exit at target, adjustment event, or time-based exit; no look-ahead; complete four-leg position closed together.
 Because the source leaves some choices discretionary, the engine will expose them as parameters rather than treating them as source facts.
 
 ### Phase 3 — Cost and execution model
-Status: NOT STARTED
+Status: COMPLETE
 Model brokerage, exchange transaction charges, GST, STT, stamp duty, SEBI/other statutory charges where applicable, bid/ask or configurable slippage, and adverse execution on gaps/fast markets. Paytm Money fee schedule must be verified before final net-return results are accepted.
 
 ### Phase 4 — Core backtest
-Status: NOT STARTED
+Status: COMPLETE
 Outputs: trade ledger; equity curve; monthly/annual returns; CAGR/annualized return; volatility; Sharpe/Sortino; maximum drawdown and duration; hit rate; average win/loss; expectancy; profit factor; exposure/capital utilization; adjustment frequency; gap-event behavior.
 
 ### Phase 5 — Robustness and sensitivity analysis
