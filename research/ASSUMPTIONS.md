@@ -11,3 +11,6 @@ This file contains backtest operational assumptions that are NOT claimed to be e
 - Where the source says "Tuesday" or "Friday", actual exchange trading dates/calendars will be used rather than assuming every calendar Tuesday/Friday is a trading day.
 
 Each assumption may be revised only through an explicit plan revision and will be sensitivity-tested when material.
+
+## Finalized implementation note
+- NIFTY contract quantity is modeled per option expiry, not per trade date, to capture the exchange's 75-to-65 lot-size transition across the 2025-12/2026-01 contract boundary.
