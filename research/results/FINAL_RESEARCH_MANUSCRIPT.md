@@ -382,6 +382,22 @@ The chronological results are encouraging as a replication check, but the indivi
 
 ---
 
+## 10A. Monthly vs Bi-weekly Differential Analysis
+
+A bounded post-validation extension decomposed the historical ledger by strategy component without changing the frozen base rules. The monthly component comprised 88 reconstructed segments and produced ₹7,28,587.80 net P&L; the bi-weekly component comprised 176 segments and produced ₹4,42,887.56.
+
+The differential was substantial at the trade level. Monthly average net P&L was ₹8,279 per segment versus ₹2,516 for bi-weekly, with profit factors of 11.42 and 3.09 respectively. Monthly's median trade was positive at ₹1,058.87, while the bi-weekly median was -₹231.05. Monthly average winners were approximately ₹15,658 versus ₹7,893 for bi-weekly, while average losers were approximately -₹1,891 versus -₹2,282.
+
+The exit decomposition provides a mechanism for the difference. Monthly had 37 target exits generating ₹7,82,292.88, while its non-target exits combined lost ₹53,705.08. Bi-weekly had 56 target exits generating ₹6,35,356.79, but its non-target exits combined lost ₹1,92,469.23. Thus, the monthly advantage reflects both larger winning trades and substantially smaller cumulative losses from non-target exits.
+
+Calendar-year consistency also differed. Monthly was positive in every calendar year in the reconstructed ledger. Bi-weekly was negative in 2021 and 2024 and nearly flat in 2023. Excluding 2020 left ₹2,85,892.08 net for monthly versus only ₹25,930.73 for bi-weekly.
+
+The regime cross-tabulation showed that both components benefited from high volatility, but monthly retained materially stronger profit factors. In the low-volatility/uptrend bucket, monthly produced ₹87,181.54 while bi-weekly produced -₹39,868.56. These regime results are descriptive and were not used to optimize or filter the base strategy.
+
+The completed Phase 7 walk-forward artifacts contain aggregate window summaries rather than component-level trade ledgers. Accordingly, no separate monthly/bi-weekly walk-forward attribution is claimed.
+
+The full differential analysis is documented in `research/results/PHASE9_MONTHLY_BIWEEKLY_DIFFERENTIAL.md`.
+
 ## 11. Inference
 
 Several findings are consistent across the research phases.
