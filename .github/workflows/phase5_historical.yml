@@ -70,7 +70,7 @@ jobs:
           python - <<'PY'
           import duckdb
           con=duckdb.connect("data/historical_2020_2026.duckdb", read_only=True)
-          print(con.execute("SELECT instrument_type, COUNT(*) rows, MIN(date) first_date, MAX(date) last_date FROM bars GROUP BY instrument_type ORDER BY instrument_type").fetchdf().to_string(index=False))
+          print(con.execute("SELECT instrument_type, COUNT(*) AS row_count, MIN(date) AS first_date, MAX(date) AS last_date FROM bars GROUP BY instrument_type ORDER BY instrument_type").fetchdf().to_string(index=False))
           print(con.execute("SELECT MIN(expiry) first_expiry, MAX(expiry) last_expiry, COUNT(DISTINCT expiry) expiries FROM bars WHERE instrument_type='OPT'").fetchdf().to_string(index=False))
           PY
 
