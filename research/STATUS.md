@@ -10,8 +10,8 @@ Last updated: 2026-10-02
 | 3 — Cost/execution model | COMPLETE / EXTENDED | Entry/exit slippage, brokerage, exchange charges, historical STT, stamp duty and GST modeled. |
 | 4 — Core backtest | COMPLETE / AUDITED | 28 trades in 2025-09 to 2026-07; net P&L ₹17,709.28. |
 | 5 — Historical extension | COMPLETE / AUDITED | 264 reconstructed segments over 2020-2026 requested window; net P&L ₹11,71,475.36. Adjustment exits: 39/39 losses, total -₹42,149.70. |
-| 6 — Robustness/sensitivity | NEXT | Slippage, cost, target, entry-time, breach-confirmation and regime sensitivity. |
-| 7 — Walk-forward validation | NOT STARTED | Requires robustness rules to be frozen. |
+| 6 — Robustness/sensitivity | COMPLETE | 12 sensitivity scenarios plus volatility/trend regime analysis completed. Most cost/target/confirmation variants remained positive; same-close entry was negative. High-volatility regimes materially outperformed low-volatility regimes. |
+| 7 — Walk-forward validation | NEXT | Chronological rolling out-of-sample windows using frozen Phase 6 base rules. |
 | 8 — Manuscript | NOT STARTED | Final manuscript after validation phases. |
 
 ## Current conclusion
