@@ -1,0 +1,94 @@
+{
+  "phase": "5-historical-2020-2026",
+  "requested_period": [
+    "2020-01-01",
+    "2026-07-28"
+  ],
+  "actual_spot_coverage": [
+    "2020-01-01",
+    "2026-07-02"
+  ],
+  "latest_trade_exit": "2026-06-05",
+  "trades": 264,
+  "wins": 134,
+  "losses": 130,
+  "win_rate": 0.5075757575757576,
+  "gross_pnl": 1223557.86,
+  "costs": 52082.39,
+  "net_pnl": 1171475.36,
+  "avg_net_pnl": 4437.406666666666,
+  "median_net_pnl": 144.71,
+  "profit_factor": 5.151265590341163,
+  "best_trade": 167157,
+  "worst_trade": -16100.51,
+  "max_drawdown": -48647.19,
+  "max_drawdown_pct_on_120k": -0.40539325,
+  "avg_holding_days": 4.0227272727,
+  "bootstrap_mean_ci": [
+    2442.196357954545,
+    6668.3085018939355
+  ],
+  "adjustments": {
+    "count": 39,
+    "wins": 0,
+    "losses": 39,
+    "net_pnl": -42149.7,
+    "mean_net_pnl": -1080.7615384615387,
+    "monthly": {
+      "count": 17,
+      "net_pnl": -20997.04
+    },
+    "biweekly": {
+      "count": 22,
+      "net_pnl": -21152.66
+    }
+  },
+  "variants": {
+    "monthly": {
+      "trades": 88,
+      "gross_pnl": 749961.44,
+      "costs": 21373.59,
+      "net_pnl": 728587.8,
+      "winners": 51,
+      "profit_factor": 11.415106
+    },
+    "biweekly": {
+      "trades": 176,
+      "gross_pnl": 473596.42,
+      "costs": 30708.8,
+      "net_pnl": 442887.56,
+      "winners": 83,
+      "profit_factor": 3.086708
+    }
+  },
+  "exit_reasons": {
+    "target": {
+      "trades": 93,
+      "net_pnl": 1417649.67
+    },
+    "adjustment": {
+      "trades": 39,
+      "net_pnl": -42149.7
+    },
+    "breakeven_exit": {
+      "trades": 45,
+      "net_pnl": -76084.33
+    },
+    "time_exit": {
+      "trades": 87,
+      "net_pnl": -127940.28
+    }
+  },
+  "yearly_net_pnl": {
+    "2020": 859652.55,
+    "2021": 73674.38,
+    "2022": 114415.39,
+    "2023": 6838.33,
+    "2024": 408.71,
+    "2025": 102541.53,
+    "2026": 13944.47
+  },
+  "dataset_sha256": "e4c6d2e1ddd2dbd9a7ab4c3be5460585ca5d8f0267123cd30b507cbbf6414bed",
+  "github_actions_run_id": 37023127851,
+  "artifact_id": 11233429861
+}
