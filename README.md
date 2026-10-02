@@ -4,7 +4,7 @@ Research project: empirical evaluation of a NIFTY positional double-calendar opt
 
 ## Current status
 
-**Final audited core deterministic backtest completed.** The daily-option sample from 2025-09-01 through 2026-07-28 produced 28 reconstructed trades and **₹17,709.28 net P&L** on the modelled ₹1.20 lakh/lot capital proxy after brokerage, exchange levies, STT, stamp duty, GST and 10-bps entry/exit slippage. The positive combined result is driven by the monthly variant; the bi-weekly variant is negative in this sample.
+**Phase 5 historical extension is in progress.** The original audited daily-option sample from 2025-09-01 through 2026-07-28 produced 28 reconstructed trades and **₹17,709.28 net P&L** on the modelled ₹1.20 lakh/lot capital proxy after brokerage, exchange levies, STT, stamp duty, GST and 10-bps entry/exit slippage. That result remains the baseline and is not being overwritten by the historical extension.
 
 ## Research controls
 
@@ -23,10 +23,12 @@ Research project: empirical evaluation of a NIFTY positional double-calendar opt
 
 The supplied source describes monthly and bi-weekly ATM double calendars with fixed profit targets, time exits, and full-position redeployment after a break-even breach. Exact Greek/IV/OI/strike filters and some execution timings are discretionary in the source, so this quantitative implementation makes those choices explicit.
 
-## Reproducibility
+## Phase 5 — Historical extension
 
-The backtest code is in `scripts/run_backtest.py`. GitHub Actions caches the public market-data DuckDB file and has a manual `workflow_dispatch` button plus automatic runs on code/workflow changes.
+The new workflow is `.github/workflows/phase5_historical.yml`. It has a manual `workflow_dispatch` control and uses GitHub Actions caching for the Hugging Face dataset cache and the constructed DuckDB. The historical option files are sourced from `rissin/nse-options-intraday` and derive from NSE F&O bhavcopy data; NIFTY spot is sourced from `thetrademarkk/india-index-options-1m`, with a 2017-2021 fallback dataset for the earlier spot period.
+
+The target research window is **2020-01-01 through 2026-07-28**, subject to actual data coverage. Raw market data is not committed to the repository; the repo records source identifiers, hashes, code, manifests and results, while Actions cache stores downloaded/build inputs.
 
 ## Research result at this stage
 
-The final core run is **not yet a validated trading-system conclusion**. The bootstrap 95% interval for mean trade P&L crosses zero, daily data cannot reconstruct intraday execution order, and the monthly and bi-weekly variants behave differently. The next planned stage is robustness/sensitivity testing, followed by frozen-parameter walk-forward validation and the final research manuscript.
+The original core run is **not yet a validated trading-system conclusion**. The bootstrap 95% interval for mean trade P&L crosses zero, daily data cannot reconstruct intraday execution order, and the monthly and bi-weekly variants behave differently. Phase 5 is intended to determine whether the adjustment losses observed in the short sample persist across a longer market history.
