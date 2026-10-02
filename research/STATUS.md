@@ -13,7 +13,7 @@ Last updated: 2026-10-02
 | 6 — Robustness/sensitivity | COMPLETE | 12 sensitivity scenarios plus volatility/trend regime analysis. Most cost/target/confirmation variants remained positive; same-close entry was negative. High-volatility regimes materially outperformed low-volatility regimes. |
 | 7 — Walk-forward validation | COMPLETE | 123 chronological validation trades across 2023, 2024, 2025 and 2026 YTD; every window had positive realized P&L, but every bootstrap interval included zero. |
 | 8 — Manuscript | COMPLETE | Final structured manuscript, tables, figures, appendices and reproducibility references committed. |
-| 9 — Monthly vs bi-weekly differential | IN PROGRESS | Dedicated frozen-rule decomposition created; GitHub Actions workflow added. No parameters optimized. |
+| 9 — Monthly vs bi-weekly differential | COMPLETE | Monthly vs bi-weekly decomposition audited from Phase 5/6 ledgers; monthly shows materially higher per-trade efficiency and consistency. |
 
 ## Phase 9 scope
 
@@ -41,6 +41,12 @@ The strongest caveats remain:
 - daily-bar and third-party-data limitations;
 - discretionary source rules that cannot be reproduced exactly.
 
+## Phase 9 conclusion
+
+The monthly component produced ₹7,28,587.80 net from 88 trade segments versus ₹4,42,887.56 from 176 bi-weekly segments. Monthly average net P&L/trade was ₹8,279 versus ₹2,516 bi-weekly; profit factor was 11.42 versus 3.09. Monthly was positive in every calendar year, while bi-weekly was negative in 2021 and 2024. Excluding 2020 left monthly at ₹2,85,892 net versus bi-weekly at ₹25,931. Regime decomposition also showed greater monthly resilience, particularly in low-volatility/uptrend conditions.
+
+These are descriptive component-attribution results under the deterministic reconstruction, not a future-performance claim.
+
 ## Stop control
 
-Phase 9 is a bounded differential-analysis extension requested after completion of the original research stop criterion. Once its results are audited and committed, the research returns to a stopped state; no further parameter optimization is initiated automatically.
+Phase 9 is a bounded differential-analysis extension requested after completion of the original research stop criterion. Its report is audited and committed. The research is now stopped again; no parameter optimization is initiated automatically.
