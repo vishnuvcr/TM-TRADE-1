@@ -6,3 +6,5 @@
 | 2026-10-02 | 1 | Historical option data source not yet validated. | Backtest cannot be run credibly until synchronized option histories are available. | Searching and validating exchange/public datasets; results will be logged here. |
 
 | 2026-10-02 | 1 | First Actions run found zero reconstructable trades. | The backtest did not execute. | Diagnosed pandas DATE/TIMESTAMP comparison in common ATM strike selection; corrected expiry normalization and added data diagnostics. |
+
+| 2026-10-02 | 4 | Successful core run required a post-merge verification because the first documented fix had not actually changed the phase branch. | Results from the earlier run were not used until the corrected commit produced a successful run (37015101390). | Verified the exact phase commit and merged the correction into main via PR #2. |
