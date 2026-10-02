@@ -1,0 +1,56 @@
+name: Phase 9 Monthly vs Bi-weekly Differential
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "Differential analysis start"
+        required: false
+        default: "2020-01-01"
+      end:
+        description: "Differential analysis end"
+        required: false
+        default: "2026-07-02"
+  push:
+    paths:
+      - "scripts/monthly_biweekly_differential.py"
+      - ".github/workflows/phase9_monthly_biweekly.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  differential:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            data/historical_2020_2026.duckdb
+            data/historical_2020_2026.duckdb.sha256
+            data/historical_manifest.json
+          key: tm-trade1-historical-duckdb-2020-2026-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install pandas numpy scipy duckdb pyarrow
+      - name: Verify cached dataset
+        run: test -f data/historical_2020_2026.duckdb
+      - name: Run frozen historical reconstruction
+        env:
+          START: ${{ inputs.start || '2020-01-01' }}
+          END: ${{ inputs.end || '2026-07-02' }}
+        run: |
+          mkdir -p phase9_results
+          python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start "$START" --end "$END" --out phase9_results
+      - name: Differential decomposition
+        run: |
+          python scripts/monthly_biweekly_differential.py --ledger phase9_results/trade_ledger.csv --out phase9_results
+      - name: Upload differential results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9-monthly-biweekly-differential
+          path: phase9_results/**
