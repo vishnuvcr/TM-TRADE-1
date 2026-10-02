@@ -472,8 +472,8 @@ def main():
     summary["nse_option_txn_pct"]=NSE_TXN*100
     summary["sebi_fee_pct"]=SEBI_FEE*100
     summary["stamp_pct_buy"]=STAMP*100
-    summary["stt_pct_sell_through_2026_03_31"]=STT_OLD*100
-    summary["stt_pct_sell_from_2026_04_01"]=STT_NEW*100
+    summary["stt_pct_sell_through_2026_03_31"]=STT_OCT2024_TO_MAR2026*100
+    summary["stt_pct_sell_from_2026_04_01"]=STT_FROM_APR2026*100
     summary["brokerage_per_order"]=BROKER_ORDER
     summary["capital_proxy"]=120000
     Path(out/"summary.json").write_text(json.dumps(summary,indent=2))
