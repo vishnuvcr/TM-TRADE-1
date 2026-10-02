@@ -205,12 +205,13 @@ class Backtester:
             orders += 1
             s=self.option_series(l.expiry,l.strike,l.opt)
             raw=float(s[s.index<=exit_date].iloc[-1]["close"])
-            v_out=abs(raw) * lot_size(exit_date)
+            exit_exec = exec_price(raw, -l.side)
+            v_out=abs(exit_exec) * lot_size(exit_date)
             cost += v_out * (NSE_TXN + SEBI_FEE)
             if l.side == -1:
-                cost += v_out * (STT_NEW if pd.Timestamp(exit_date)>=pd.Timestamp("2026-04-01") else STT_OLD)
-            else:
                 cost += v_out * STAMP
+            else:
+                cost += v_out * (STT_NEW if pd.Timestamp(exit_date)>=pd.Timestamp("2026-04-01") else STT_OLD)
         brokerage = orders * BROKER_ORDER
         gst = GST * (brokerage + self.exchange_cost_basis(legs, exit_date))
         return cost + brokerage + gst
@@ -221,8 +222,9 @@ class Backtester:
             v1=abs(l.entry_exec)*lot_size(l.entry_date)
             s=self.option_series(l.expiry,l.strike,l.opt)
             raw=float(s[s.index<=exit_date].iloc[-1]["close"])
-            v2=abs(raw)*lot_size(exit_date)
-            total += (v1+v2)*NSE_TXN
+            exit_exec=exec_price(raw, -l.side)
+            v2=abs(exit_exec)*lot_size(exit_date)
+            total += (v1+v2)*(NSE_TXN+SEBI_FEE)
         return total
 
     def breakevens(self, legs, date):
@@ -310,8 +312,9 @@ class Backtester:
             for l in legs:
                 s=self.option_series(l.expiry,l.strike,l.opt)
                 raw=float(s[s.index<=exit_date].iloc[-1]["close"])
+                exit_exec=exec_price(raw, -l.side)
                 raw_exit_prices[(l.expiry.date(),l.strike,l.opt)]=raw
-                gross += l.pnl(raw, lot)
+                gross += l.pnl(exit_exec, lot)
             costs=self.costs(legs,exit_date)
             net=gross-costs
             rows.append({
