@@ -2,6 +2,10 @@ name: Phase 6 Robustness Sensitivity
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/phase6_robustness.yml"
+      - "scripts/run_backtest.py"
 
 permissions:
   contents: read
