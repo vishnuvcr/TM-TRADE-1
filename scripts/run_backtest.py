@@ -145,10 +145,11 @@ class Backtester:
         ).fetchdf()
         if df.empty:
             return None
+        df["expiry"] = pd.to_datetime(df["expiry"]).dt.normalize()
         sets = {}
-        for ex in [pd.Timestamp(near_exp), pd.Timestamp(far_exp)]:
-            s_ce = set(df[(df.expiry==ex.date()) & (df.option_type=="CE")]["strike"].astype(int))
-            s_pe = set(df[(df.expiry==ex.date()) & (df.option_type=="PE")]["strike"].astype(int))
+        for ex in [pd.Timestamp(near_exp).normalize(), pd.Timestamp(far_exp).normalize()]:
+            s_ce = set(df[(df.expiry==ex) & (df.option_type=="CE")]["strike"].astype(int))
+            s_pe = set(df[(df.expiry==ex) & (df.option_type=="PE")]["strike"].astype(int))
             sets[ex] = s_ce & s_pe
         common = sets[pd.Timestamp(near_exp)] & sets[pd.Timestamp(far_exp)]
         if not common:
@@ -434,6 +435,15 @@ def main():
     bt=Backtester(args.db,args.start,args.end,args.entry_mode)
     df=bt.run()
     if df.empty:
+        stats = bt.con.execute("SELECT instrument_type, underlying, COUNT(*) AS rows, MIN(date) AS first_date, MAX(date) AS last_date FROM bars GROUP BY instrument_type, underlying ORDER BY instrument_type, underlying").fetchdf()
+        ex = bt.con.execute("SELECT MIN(expiry) AS first_expiry, MAX(expiry) AS last_expiry, COUNT(DISTINCT expiry) AS expiries FROM bars WHERE instrument_type='OPT' AND underlying='NIFTY'").fetchdf()
+        probe = bt.con.execute("SELECT expiry, date, COUNT(DISTINCT strike) AS strikes, COUNT(*) AS rows FROM bars WHERE instrument_type='OPT' AND underlying='NIFTY' AND date BETWEEN ? AND ? GROUP BY expiry, date ORDER BY date, expiry LIMIT 20", [bt.start.date(), (bt.start+pd.Timedelta(days=45)).date()]).fetchdf()
+        print("DATA_STATS")
+        print(stats.to_string(index=False))
+        print("OPTION_EXPIRY_STATS")
+        print(ex.to_string(index=False))
+        print("OPTION_PROBE")
+        print(probe.to_string(index=False))
         raise SystemExit("No trades could be reconstructed from available data.")
     df.to_csv(out/"trade_ledger.csv",index=False)
 
