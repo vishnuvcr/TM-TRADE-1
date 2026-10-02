@@ -5,19 +5,19 @@ Last updated: 2026-10-02
 | Phase | Status | Current result |
 |---|---|---|
 | 0 — Specification/audit | COMPLETE | Strategy rules, assumptions, research plan and error log initialized. |
-| 1 — Data acquisition | COMPLETE / EXTENDED | Historical NIFTY daily option data source identified on Hugging Face; source derives from NSE F&O bhavcopy. NIFTY spot source covers 2021-05 onward, with a 2017-2021 hourly fallback. |
+| 1 — Data acquisition | COMPLETE / EXTENDED | Historical NIFTY daily option data acquired through a cached Hugging Face pipeline; coverage and hashes recorded. |
 | 2 — Deterministic strategy engine | COMPLETE | Monthly + bi-weekly reconstruction implemented with explicit operational assumptions. |
-| 3 — Cost/execution model | COMPLETE / EXTENDED | Entry/exit slippage, brokerage, exchange charges, STT, stamp duty and GST modeled; historical STT schedule added. |
-| 4 — Core backtest | COMPLETE / AUDITED | 28 trades in the 2025-09 to 2026-07 sample; final net P&L ₹17,709.28. |
-| 5 — Historical extension | IN PROGRESS | Phase branch phase-5-historical-2020-2026; target window 2020-01-01 to 2026-07-28 using cached Hugging Face Parquet inputs. |
-| 6 — Robustness/sensitivity | NOT STARTED | Slippage, cost, target, entry-time, breach-confirmation and regime sensitivity. |
+| 3 — Cost/execution model | COMPLETE / EXTENDED | Entry/exit slippage, brokerage, exchange charges, historical STT, stamp duty and GST modeled. |
+| 4 — Core backtest | COMPLETE / AUDITED | 28 trades in 2025-09 to 2026-07; net P&L ₹17,709.28. |
+| 5 — Historical extension | COMPLETE / AUDITED | 264 reconstructed segments over 2020-2026 requested window; net P&L ₹11,71,475.36. Adjustment exits: 39/39 losses, total -₹42,149.70. |
+| 6 — Robustness/sensitivity | NEXT | Slippage, cost, target, entry-time, breach-confirmation and regime sensitivity. |
 | 7 — Walk-forward validation | NOT STARTED | Requires robustness rules to be frozen. |
 | 8 — Manuscript | NOT STARTED | Final manuscript after validation phases. |
 
 ## Current conclusion
-The original deterministic reconstruction is positive in aggregate, but the bootstrap 95% interval for mean trade P&L crosses zero. The monthly and bi-weekly variants diverge materially: monthly is positive while bi-weekly is negative in the tested 2025-09 to 2026-07 sample.
+The historical extension materially expands the sample. Under the deterministic reconstruction, the aggregate result is positive and the bootstrap 95% interval for mean trade P&L is above zero. However, 2020 contributes an unusually large share of the aggregate P&L, and the model still has daily-data, discretionary-rule and third-party-data limitations.
 
-The historical extension is being treated as a new research phase rather than silently replacing the audited result. The phase-5 dataset will be separately hashed and coverage-checked before its results are accepted.
+For the specific adjustment question: **adjustments remained loss-making in the long sample**. There were 39 adjustment exits, with zero profitable adjustment exits and total net P&L of -₹42,149.70.
 
 ## Next research action
-Complete the historical 2020-2026 reconstruction, audit data coverage and lot-size transitions, then compare adjustment outcomes across market regimes. After that, proceed to robustness/sensitivity testing.
+Freeze the historical rules and run robustness/sensitivity analysis, including a dedicated 2020 exclusion/regime analysis and parameter sensitivity before any final trading-system conclusion.
