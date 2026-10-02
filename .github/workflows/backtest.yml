@@ -15,7 +15,6 @@ on:
     paths:
       - "scripts/run_backtest.py"
       - ".github/workflows/backtest.yml"
-      - "research/**"
 
 permissions:
   contents: read
