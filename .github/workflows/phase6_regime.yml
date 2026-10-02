@@ -1,0 +1,42 @@
+name: Phase 6 Regime Analysis
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/regime_analysis.py"
+      - ".github/workflows/phase6_regime.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  regime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            data/historical_2020_2026.duckdb
+            data/historical_2020_2026.duckdb.sha256
+            data/historical_manifest.json
+          key: tm-trade1-historical-duckdb-2020-2026-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install pandas numpy scipy duckdb pyarrow
+      - name: Run frozen Phase 6 base
+        run: |
+          mkdir -p regime_results
+          python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --out regime_results
+      - name: Analyze regimes
+        run: |
+          python scripts/regime_analysis.py --db data/historical_2020_2026.duckdb --ledger regime_results/trade_ledger.csv --out regime_results
+      - name: Upload regime results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase6-regime-analysis
+          path: regime_results/**
