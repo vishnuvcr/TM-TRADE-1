@@ -102,11 +102,15 @@ def implied_vol(price, S, K, T, typ):
         return 0.30
 
 class Backtester:
-    def __init__(self, db_path, start, end, entry_mode="next_open"):
+    def __init__(self, db_path, start, end, entry_mode="next_open", monthly_target=3000.0, biweekly_target=1600.0, slippage_bps=10.0, confirmation_days=1):
         self.con = duckdb.connect(db_path, read_only=True)
         self.start = pd.Timestamp(start)
         self.end = pd.Timestamp(end)
         self.entry_mode = entry_mode
+        self.monthly_target = float(monthly_target)
+        self.biweekly_target = float(biweekly_target)
+        self.slippage_bps = float(slippage_bps)
+        self.confirmation_days = int(confirmation_days)
         self._cache = {}
 
         self.index = self.con.execute(
@@ -284,6 +288,7 @@ class Backtester:
                 rows.append({"kind":kind,"segment":segment_no,"entry_date":str(current_entry.date()),"status":"SKIP","reason":err})
                 return rows, current_entry, "data_gap"
             prev_be=None
+            outside_count=0
             exit_date=None
             exit_reason=None
             last_eval=current_entry
@@ -301,13 +306,14 @@ class Backtester:
                 if be:
                     lo,hi=be
                     breached=(spot<lo or spot>hi)
-                    prev_inside=True
-                    if prev_be:
-                        pspot=float(self.index.loc[last_eval,"close"])
-                        prev_inside=(prev_be[0] <= pspot <= prev_be[1])
+                    if breached:
+                        outside_count += 1
                     else:
-                        prev_inside=True
-                    breached = breached and prev_inside
+                        outside_count = 0
+                    breached = outside_count >= max(1,self.confirmation_days)
+                else:
+                    outside_count = 0
+                    breached = False
                 if breached:
                     if d <= adjust_limit and next_trading(self.days,d) is not None and next_trading(self.days,d) < hard_end:
                         exit_date=d; exit_reason="adjustment"; break
@@ -361,7 +367,7 @@ class Backtester:
             hard=first_friday_on_or_after(self.days,monthly_entry+pd.Timedelta(days=7))
             if hard is None: continue
             hard=min(hard,self.end)
-            rs, exit_day, _=self.run_segmented_trade("monthly",m1,m2,monthly_entry,3000.0,hard)
+            rs, exit_day, _=self.run_segmented_trade("monthly",m1,m2,monthly_entry,self.monthly_target,hard)
             trades.extend(rs)
             if not rs or not exit_day: continue
 
@@ -379,7 +385,7 @@ class Backtester:
                 if hard_b>=next_monthly:
                     hard_b=first_trading_on_or_after(self.days,next_monthly-pd.Timedelta(days=1))
                     if hard_b is None or hard_b<=cursor: break
-                rs, b_exit, _=self.run_segmented_trade("biweekly",near,far,cursor,1600.0,hard_b)
+                rs, b_exit, _=self.run_segmented_trade("biweekly",near,far,cursor,self.biweekly_target,hard_b)
                 trades.extend(rs)
                 if not rs or not b_exit: break
                 cursor=next_trading(self.days,b_exit)
@@ -441,7 +447,11 @@ def main():
     ap.add_argument("--start", default="2020-01-01")
     ap.add_argument("--end", default="2026-07-28")
     ap.add_argument("--out", default="results")
-    ap.add_argument("--entry-mode", default="next_open")
+    ap.add_argument("--entry-mode", choices=["next_open","same_close"], default="next_open")
+    ap.add_argument("--monthly-target", type=float, default=3000.0)
+    ap.add_argument("--biweekly-target", type=float, default=1600.0)
+    ap.add_argument("--slippage-bps", type=float, default=10.0)
+    ap.add_argument("--confirmation-days", type=int, default=1)
     args=ap.parse_args()
 
     out=Path(args.out); out.mkdir(parents=True,exist_ok=True)
@@ -449,7 +459,9 @@ def main():
     manifest={"db":str(p),"sha256":hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None}
     Path(out/"data_manifest.json").write_text(json.dumps(manifest,indent=2))
 
-    bt=Backtester(args.db,args.start,args.end,args.entry_mode)
+    global SLIPPAGE_BPS
+    SLIPPAGE_BPS = float(args.slippage_bps)
+    bt=Backtester(args.db,args.start,args.end,args.entry_mode,args.monthly_target,args.biweekly_target,args.slippage_bps,args.confirmation_days)
     df=bt.run()
     if df.empty:
         stats = bt.con.execute("SELECT instrument_type, underlying, COUNT(*) AS rows, MIN(date) AS first_date, MAX(date) AS last_date FROM bars GROUP BY instrument_type, underlying ORDER BY instrument_type, underlying").fetchdf()
@@ -468,6 +480,9 @@ def main():
     summary["period_start"]=args.start
     summary["period_end"]=args.end
     summary["entry_mode"]=args.entry_mode
+    summary["monthly_target"]=args.monthly_target
+    summary["biweekly_target"]=args.biweekly_target
+    summary["confirmation_days"]=args.confirmation_days
     summary["slippage_bps"]=SLIPPAGE_BPS
     summary["nse_option_txn_pct"]=NSE_TXN*100
     summary["sebi_fee_pct"]=SEBI_FEE*100
