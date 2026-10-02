@@ -1,0 +1,93 @@
+name: Phase 6 Robustness Sensitivity
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sensitivity:
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario:
+          - base
+          - exclude_2020
+          - slip_0
+          - slip_20
+          - slip_30
+          - monthly_target_2000
+          - monthly_target_4000
+          - biweekly_target_1000
+          - biweekly_target_2200
+          - same_close
+          - confirm_2
+          - confirm_3
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            data/historical_2020_2026.duckdb
+            data/historical_2020_2026.duckdb.sha256
+            data/historical_manifest.json
+          key: tm-trade1-historical-duckdb-2020-2026-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install pandas numpy scipy duckdb pyarrow
+      - name: Verify cached database
+        run: test -f data/historical_2020_2026.duckdb
+      - name: Run scenario
+        env:
+          SCENARIO: ${{ matrix.scenario }}
+        run: |
+          mkdir -p sensitivity_results
+          case "$SCENARIO" in
+            base)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --out sensitivity_results
+              ;;
+            exclude_2020)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2021-01-01 --end 2026-07-28 --out sensitivity_results
+              ;;
+            slip_0)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --slippage-bps 0 --out sensitivity_results
+              ;;
+            slip_20)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --slippage-bps 20 --out sensitivity_results
+              ;;
+            slip_30)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --slippage-bps 30 --out sensitivity_results
+              ;;
+            monthly_target_2000)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --monthly-target 2000 --out sensitivity_results
+              ;;
+            monthly_target_4000)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --monthly-target 4000 --out sensitivity_results
+              ;;
+            biweekly_target_1000)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --biweekly-target 1000 --out sensitivity_results
+              ;;
+            biweekly_target_2200)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --biweekly-target 2200 --out sensitivity_results
+              ;;
+            same_close)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --entry-mode same_close --out sensitivity_results
+              ;;
+            confirm_2)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --confirmation-days 2 --out sensitivity_results
+              ;;
+            confirm_3)
+              python scripts/run_backtest.py --db data/historical_2020_2026.duckdb --start 2020-01-01 --end 2026-07-28 --confirmation-days 3 --out sensitivity_results
+              ;;
+          esac
+          cp sensitivity_results/summary.json sensitivity_results/${SCENARIO}.json
+      - name: Upload scenario result
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase6-${{ matrix.scenario }}
+          path: sensitivity_results/${{ matrix.scenario }}.json
