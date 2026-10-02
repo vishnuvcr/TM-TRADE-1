@@ -20,6 +20,13 @@ The most important structural findings are:
 - Excluding 2020 left **₹3,16,260** net P&L.
 - Same-close entry produced **-₹2,74,505**, demonstrating material execution-timing sensitivity.
 
+## Phase 9 — Monthly vs Bi-weekly differential
+
+The bounded component-level extension is complete. Monthly generated **₹7,28,587.80 net from 88 trades**, versus **₹4,42,887.56 from 176 bi-weekly trades**. Monthly average net P&L/trade was **₹8,279** versus **₹2,516** bi-weekly, and monthly was positive in every calendar year in the historical ledger. Excluding 2020 left monthly at ₹2,85,892 net versus bi-weekly at ₹25,931.
+
+- [Phase 9 monthly vs bi-weekly differential report](research/results/PHASE9_MONTHLY_BIWEEKLY_DIFFERENTIAL.md)
+- [Phase 9 workflow](.github/workflows/phase9_monthly_biweekly.yml)
+
 ## Final manuscript
 
 - [Final research manuscript](research/results/FINAL_RESEARCH_MANUSCRIPT.md)
