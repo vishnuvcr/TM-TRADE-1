@@ -16,7 +16,9 @@ SLIPPAGE_BPS = 10.0
 LOT_CHANGE_DATE = pd.Timestamp("2026-01-06")
 # Expiry-date lot-size schedule: 50 before Apr-2024 transition, 25 for
 # contracts introduced after Apr-25-2024 and before Nov-21-2024, 75 thereafter,
-# and 65 from the Jan-2026 transition. These are expiry/generation proxies.\nLOT_50_END = pd.Timestamp("2024-04-25")\nLOT_25_END = pd.Timestamp("2024-11-20")
+# and 65 from the Jan-2026 transition. These are expiry/generation proxies.
+LOT_50_END = pd.Timestamp("2024-04-25")
+LOT_25_END = pd.Timestamp("2024-11-20")
 NSE_TXN = 0.0003553
 SEBI_FEE = 0.000001
 STAMP = 0.00003
