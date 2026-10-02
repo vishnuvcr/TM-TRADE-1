@@ -37,8 +37,8 @@ class Leg:
     def pnl(self, mark, lot):
         return self.side * (mark - self.entry_exec) * lot
 
-def lot_size(d):
-    return LOT_NEW if pd.Timestamp(d) >= LOT_CHANGE_DATE else LOT_OLD
+def lot_size_for_expiry(expiry):
+    return LOT_NEW if pd.Timestamp(expiry) >= LOT_CHANGE_DATE else LOT_OLD
 
 def first_trading_on_or_after(days, d):
     x = pd.Timestamp(d)
@@ -174,9 +174,9 @@ class Backtester:
         return legs, None
 
     def mark_position(self, legs, date):
-        lot = lot_size(date)
         pnl=0.0
         for l in legs:
+            lot = lot_size_for_expiry(l.expiry)
             s=self.option_series(l.expiry,l.strike,l.opt)
             if s.empty:
                 return None
@@ -195,7 +195,7 @@ class Backtester:
         for l in legs:
             # Entry
             orders += 1
-            v_in = abs(l.entry_exec) * lot_size(l.entry_date)
+            v_in = abs(l.entry_exec) * lot_size_for_expiry(l.expiry)
             cost += v_in * (NSE_TXN + SEBI_FEE)
             if l.side == 1:
                 cost += v_in * STAMP
@@ -206,7 +206,7 @@ class Backtester:
             s=self.option_series(l.expiry,l.strike,l.opt)
             raw=float(s[s.index<=exit_date].iloc[-1]["close"])
             exit_exec = exec_price(raw, -l.side)
-            v_out=abs(exit_exec) * lot_size(exit_date)
+            v_out=abs(exit_exec) * lot_size_for_expiry(l.expiry)
             cost += v_out * (NSE_TXN + SEBI_FEE)
             if l.side == -1:
                 cost += v_out * STAMP
@@ -219,11 +219,11 @@ class Backtester:
     def exchange_cost_basis(self, legs, exit_date):
         total=0.0
         for l in legs:
-            v1=abs(l.entry_exec)*lot_size(l.entry_date)
+            v1=abs(l.entry_exec)*lot_size_for_expiry(l.expiry)
             s=self.option_series(l.expiry,l.strike,l.opt)
             raw=float(s[s.index<=exit_date].iloc[-1]["close"])
             exit_exec=exec_price(raw, -l.side)
-            v2=abs(exit_exec)*lot_size(exit_date)
+            v2=abs(exit_exec)*lot_size_for_expiry(l.expiry)
             total += (v1+v2)*(NSE_TXN+SEBI_FEE)
         return total
 
@@ -238,10 +238,9 @@ class Backtester:
             px=float(row.iloc[-1]["close"])
             T=max((pd.Timestamp(l.expiry)-pd.Timestamp(date)).days/365.0, 1/3650)
             iv=implied_vol(px,S,l.strike,T,l.opt)
-            params.append((l.side,l.opt,l.strike,T,iv,l.entry_exec))
+            params.append((l.side,l.opt,l.strike,T,iv,l.entry_exec,l.expiry))
         def pnl_at(x):
-            lot=lot_size(date)
-            return sum(side*(bs_price(x,k,T,iv,opt)-entry)*lot for side,opt,k,T,iv,entry in params)
+            return sum(side*(bs_price(x,k,T,iv,opt)-entry)*lot_size_for_expiry(exp) for side,opt,k,T,iv,entry,exp in params)
         grid=np.arange(max(0.5*S,S-0.25*S), 1.25*S, 25.0)
         vals=np.array([pnl_at(float(x)) for x in grid])
         roots=[]
@@ -268,7 +267,6 @@ class Backtester:
             if legs is None:
                 rows.append({"kind":kind,"segment":segment_no,"entry_date":str(current_entry.date()),"status":"SKIP","reason":err})
                 return rows, current_entry, "data_gap"
-            lot=lot_size(current_entry)
             prev_be=None
             exit_date=None
             exit_reason=None
@@ -314,14 +312,14 @@ class Backtester:
                 raw=float(s[s.index<=exit_date].iloc[-1]["close"])
                 exit_exec=exec_price(raw, -l.side)
                 raw_exit_prices[(l.expiry.date(),l.strike,l.opt)]=raw
-                gross += l.pnl(exit_exec, lot)
+                gross += l.pnl(exit_exec, lot_size_for_expiry(l.expiry))
             costs=self.costs(legs,exit_date)
             net=gross-costs
             rows.append({
                 "kind":kind,"segment":segment_no,
                 "entry_date":str(current_entry.date()),"exit_date":str(exit_date.date()),
                 "near_expiry":str(pd.Timestamp(near_exp).date()),"far_expiry":str(pd.Timestamp(far_exp).date()),
-                "strike":int(legs[0].strike),"lot_size":int(lot),
+                "strike":int(legs[0].strike),"near_lot_size":int(lot_size_for_expiry(near_exp)),"far_lot_size":int(lot_size_for_expiry(far_exp)),
                 "gross_pnl":round(gross,2),"costs":round(costs,2),"net_pnl":round(net,2),
                 "exit_reason":exit_reason,"days_held":int((exit_date-current_entry).days),
             })

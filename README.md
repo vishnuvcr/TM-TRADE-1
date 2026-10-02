@@ -4,7 +4,7 @@ Research project: empirical evaluation of a NIFTY positional double-calendar opt
 
 ## Current status
 
-**Corrected core deterministic backtest completed.** The available daily-option sample from 2025-09-01 through 2026-07-28 produced 29 reconstructed trades and **₹17,717.27 net P&L** on the modelled ₹1.20 lakh/lot capital proxy after corrected brokerage, exchange levies, STT, stamp duty, GST and 10-bps entry/exit slippage. The positive combined result is driven by the monthly variant; the bi-weekly variant is negative in this sample.
+**Final audited core deterministic backtest completed.** The daily-option sample from 2025-09-01 through 2026-07-28 produced 28 reconstructed trades and **₹17,709.28 net P&L** on the modelled ₹1.20 lakh/lot capital proxy after brokerage, exchange levies, STT, stamp duty, GST and 10-bps entry/exit slippage. The positive combined result is driven by the monthly variant; the bi-weekly variant is negative in this sample.
 
 ## Research controls
 
@@ -15,9 +15,9 @@ Research project: empirical evaluation of a NIFTY positional double-calendar opt
 - [Source notes](research/SOURCE_NOTES.md)
 - [Literature notes](research/LITERATURE_NOTES.md)
 - [Data sources](research/DATA_SOURCES.md)
-- [Corrected core backtest report](research/results/CORE_BACKTEST_RESULTS.md)
-- [Corrected trade ledger](research/results/trade_ledger.csv)
-- [Machine-readable summary](research/results/summary.json)
+- [Final core backtest report](research/results/CORE_BACKTEST_RESULTS.md)
+- [Final trade ledger](research/results/trade_ledger.csv)
+- [Final machine-readable summary](research/results/summary.json)
 
 ## Strategy under test
 
@@ -29,4 +29,4 @@ The backtest code is in `scripts/run_backtest.py`. GitHub Actions caches the pub
 
 ## Research result at this stage
 
-The corrected core run is **not yet a validated trading-system conclusion**. The bootstrap 95% interval for mean trade P&L crosses zero, daily data cannot reconstruct intraday execution order, and the two strategy variants behave differently. The next planned stage is robustness/sensitivity testing, followed by frozen-parameter walk-forward validation and the final research manuscript.
+The final core run is **not yet a validated trading-system conclusion**. The bootstrap 95% interval for mean trade P&L crosses zero, daily data cannot reconstruct intraday execution order, and the monthly and bi-weekly variants behave differently. The next planned stage is robustness/sensitivity testing, followed by frozen-parameter walk-forward validation and the final research manuscript.
